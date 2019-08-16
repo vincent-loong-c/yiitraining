@@ -80,6 +80,8 @@ class StatusController extends Controller
         $model = new Status();
  
         if ($model->load(Yii::$app->request->post())) {
+          $model->created_by = Yii::$app->user->getId();
+          
           $model->created_at = time();
           $model->updated_at = time();
            if ($model->save()) {             
@@ -100,6 +102,10 @@ class StatusController extends Controller
      */
     public function actionUpdate($id)
     {
+        if(Yii::$app->user->identity->role !=1){
+            Yii::$app->session->setFlash('error', "You do not have access for modifications.");
+            return $this->false;
+        }
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -120,6 +126,10 @@ class StatusController extends Controller
      */
     public function actionDelete($id)
     {
+        if(Yii::$app->user->identity->role !=1){
+            Yii::$app->session->setFlash('error', "You do not have access for modifications.");
+           return false;
+        }
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);

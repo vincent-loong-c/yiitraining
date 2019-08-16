@@ -9,6 +9,7 @@ use yii\bootstrap\Nav;
 use yii\bootstrap\NavBar;
 use yii\widgets\Breadcrumbs;
 use app\assets\AppAsset;
+use PHPUnit\Framework\MockObject\Builder\Identity;
 
 AppAsset::register($this);
 ?>
@@ -42,9 +43,9 @@ AppAsset::register($this);
         ['label' => Yii::t('app','Contact'), 'url' => ['/site/contact']]
       ];
       if (Yii::$app->user->isGuest) {
-        array_push($navItems,['label' => 'Sign In', 'url' => ['/user/login']],['label' => 'Sign Up', 'url' => ['/user/register']]);
+        array_push($navItems,['label' => 'Login', 'url' => ['/user/login']],['label' => 'Sign Up', 'url' => ['/user/register']]);
       } else {
-        array_push($navItems,['label' => 'Logout (' . Yii::$app->user->identity->username . ')',
+        array_push($navItems,['label' => 'Logout (' . Yii::$app->user->identity->username . ', ROLE:' . Yii::$app->user->Identity->role . ')',
             'url' => ['/site/logout'],
             'linkOptions' => ['data-method' => 'post']]
         );

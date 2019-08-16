@@ -5,6 +5,8 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'basic',
+    //SET TIMEZONE
+    'timeZone' => 'Asia/Singapore',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'language' => 'en',
@@ -20,11 +22,15 @@ $config = [
             'cost' => 12,
             'admins' => ['admin']
         ],
+        
     ],
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'zfWXDmVVSBjtaIsdUBMTD9SHJ-64AhKW',
+            'parsers' => [
+                'application/json' => 'yii\web\JsonParser',
+            ],
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -63,6 +69,7 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'user_'],
             ],
         ],
         'i18n' => [
@@ -74,6 +81,7 @@ $config = [
             ],
         ],
     ],
+    
     'params' => $params,
 ];
 

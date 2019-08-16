@@ -4,14 +4,14 @@ use yii\helpers\Html;
 use yii\widgets\DetailView;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Status */
+/* @var $model app\models\User_ */
 
 $this->title = $model->id;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Statuses'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'User_s'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
-<div class="status-view">
+<div class="user_-view">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -30,11 +30,19 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'createdBy.email',
-            'message:ntext',
-            'permissions',
-            'created_at:datetime',
-            'updated_at:datetime',
+            'username',
+            'email:email',
+            'password_hash',
+            'auth_key',
+            'confirmed_at',
+            'unconfirmed_email:email',
+            'blocked_at',
+            'registration_ip',
+            'created_at',
+            'updated_at',
+            'flags',
+            'last_login_at',
+            'role',
         ],
     ]) ?>
 
