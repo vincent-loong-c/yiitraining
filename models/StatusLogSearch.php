@@ -4,14 +4,12 @@ namespace app\models;
 
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use app\models\Status;
-use yii\behaviors\SluggableBehavior;
-use yii\behaviors\BlameableBehavior;
+use app\models\StatusLog;
 
 /**
- * StatusSearch represents the model behind the search form of `app\models\Status`.
+ * StatusLogSearch represents the model behind the search form of `app\models\StatusLog`.
  */
-class StatusSearch extends Status
+class StatusLogSearch extends StatusLog
 {
     /**
      * {@inheritdoc}
@@ -19,8 +17,7 @@ class StatusSearch extends Status
     public function rules()
     {
         return [
-            [['id', 'permissions', 'created_at', 'updated_at'], 'integer'],
-            [['message'], 'safe'],
+            [['id', 'status_id', 'updated_by', 'created_at'], 'integer'],
         ];
     }
 
@@ -42,7 +39,7 @@ class StatusSearch extends Status
      */
     public function search($params)
     {
-        $query = Status::find();
+        $query = StatusLog::find();
 
         // add conditions that should always apply here
 
@@ -61,12 +58,10 @@ class StatusSearch extends Status
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'permissions' => $this->permissions,
+            'status_id' => $this->status_id,
+            'updated_by' => $this->updated_by,
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
         ]);
-
-        $query->andFilterWhere(['like', 'message', $this->message]);
 
         return $dataProvider;
     }

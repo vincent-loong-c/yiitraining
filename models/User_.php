@@ -3,6 +3,12 @@
 namespace app\models;
 
 use Yii;
+use yii\web\IdentityInterface;
+use yii\db\ActiveRecord;
+use yii\filters\auth\CompositeAuth;
+use yii\filters\auth\HttpBasicAuth;
+use yii\filters\auth\HttpBearerAuth;
+use yii\filters\auth\QueryParamAuth;
 
 /**
  * This is the model class for table "user".
@@ -22,11 +28,8 @@ use Yii;
  * @property int $last_login_at
  * @property int $role
  *
- * @property Profile $profile
- * @property SocialAccount[] $socialAccounts
- * @property Token[] $tokens
  */
-class User_ extends \yii\db\ActiveRecord
+class User_ extends \yii\db\ActiveRecord implements IdentityInterface
 {
     /**
      * {@inheritdoc}
@@ -34,6 +37,40 @@ class User_ extends \yii\db\ActiveRecord
     public static function tableName()
     {
         return 'user';
+    }
+
+    public static function findIdentity($id)
+    {
+        return static::findOne($id);
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    public function getAuthKey()
+    {
+        return $this->authKey;
+    }
+
+    public function validateAuthKey($authKey)
+    {
+        return $this->authKey === $authKey;
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        return static::findOne(['auth_key' => $token]);
+    }
+
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['authenticator'] = [
+            'class' => HttpBasicAuth::className(),
+        ];
+        return $behaviors;
     }
 
     /**
@@ -56,6 +93,12 @@ class User_ extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
+    public function init()
+    {
+        parent::init();
+        \Yii::$app->user->enableSession = false;
+    }
+
     public function attributeLabels()
     {
         return [
@@ -77,37 +120,31 @@ class User_ extends \yii\db\ActiveRecord
     }
     public function fields()
     {
-        $fields = parent::fields();
+        return [
+            'username',
+            'email',
+            'role',
+        ];
+        // $fields = parent::fields();
         
-        // remove fields that contain sensitive information
-        unset(
-            $fields['password_hash'],
-            $fields['auth_key'], 
-            $fields['confirmed_at'],
-            $fields['unconfirmed_email'],
-            $fields['registration_ip'],
-            $fields['created_at'],
-            $fields['updated_at'],
-            $fields['flags']
+        // // remove fields that contain sensitive information
+        // unset(
+        //     $fields['password_hash'],
+        //     $fields['auth_key'], 
+        //     $fields['confirmed_at'],
+        //     $fields['unconfirmed_email'],
+        //     $fields['registration_ip'],
+        //     $fields['created_at'],
+        //     $fields['updated_at'],
+        //     $fields['flags']
             
-        );
+        // );
         
-        return $fields;
-    }
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProfile()
-    {
-        return $this->hasOne(Profile::className(), ['user_id' => 'id']);
+        // return $fields;
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSocialAccounts()
-    {
-        return $this->hasMany(SocialAccount::className(), ['user_id' => 'id']);
+    public function extraFields(){
+        return ['auth_key'];
     }
 
     /**

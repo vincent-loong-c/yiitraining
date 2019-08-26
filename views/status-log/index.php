@@ -4,20 +4,18 @@ use yii\helpers\Html;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\models\StatusSearch */
+/* @var $searchModel app\models\StatusLogSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Statuses');
+$this->title = Yii::t('app', 'Status Logs');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="status-index">
+<div class="status-log-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
-    <p>If record can't be deleted, delete related record in log session.
-    </p>
     <p>
-        <?= Html::a(Yii::t('app', 'Create Status'), ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a(Yii::t('app', 'Create Status Log'), ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -27,12 +25,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-            
+
             'id',
-            'message:ntext',
-            'permissions',
+            'status_id',
+            'updated_by',
             'created_at:datetime',
-            'updated_at:datetime',
 
             ['class' => 'yii\grid\ActionColumn'],
         ],

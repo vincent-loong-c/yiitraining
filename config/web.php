@@ -67,9 +67,18 @@ $config = [
         
         'urlManager' => [
             'enablePrettyUrl' => true,
+            'enableStrictParsing' => false,
             'showScriptName' => false,
             'rules' => [
-                ['class' => 'yii\rest\UrlRule', 'controller' => 'user_'],
+                [
+                    'class' => 'yii\rest\UrlRule',
+                    'controller' => 'user_',
+                    'extraPatterns' => [
+                        'GET view' => 'view',
+                        'GET index' => 'index',
+                        'POST logout' => 'logout',
+                    ],
+                ],
             ],
         ],
         'i18n' => [

@@ -1,8 +1,10 @@
 <?php
 
 namespace app\models;
-
+ 
 use Yii;
+use yii\behaviors\SluggableBehavior;
+use yii\behaviors\BlameableBehavior;
 
 /**
  * This is the model class for table "status".
@@ -17,9 +19,25 @@ class Status extends \yii\db\ActiveRecord
 {
   const PERMISSIONS_PRIVATE = 10;
   const PERMISSIONS_PUBLIC = 20;  
-    /**
-     * {@inheritdoc}
-     */
+    
+
+    public function behaviors()
+    {
+        return [
+            [
+                'class' => SluggableBehavior::className(),
+                'attribute' => 'message',
+                'immutable' => true,
+                'ensureUnique'=>true,
+            ],
+            [
+                'class' => BlameableBehavior::className(),
+                'createdByAttribute' => 'created_by',
+                'updatedByAttribute' => 'updated_by',
+            ],
+        ];
+    }
+
     public static function tableName()
     {
       return 'status';
@@ -32,7 +50,7 @@ class Status extends \yii\db\ActiveRecord
     {
       return [
         [['message', 'created_at', 'updated_at'], 'required'],
-        [['message'], 'string'],
+        [['message'], 'string', 'max' => 140],
         [['permissions', 'created_at', 'updated_at'], 'integer'],
         
             //To default the permission to be PUBLIC if is not selected any choice.
@@ -73,4 +91,18 @@ class Status extends \yii\db\ActiveRecord
       {
         return $this->hasOne(User_::className(), ['id' => 'created_by']);
       }
+
+public function afterSave($insert,$changeAttributes){
+  parent::afterSave($insert,$changeAttributes);
+  // when insert false, then record has been updated
+            if (!$insert) {
+              // add StatusLog entry
+              $status_log = new StatusLog;
+              $status_log->status_id = $this->id;
+              $status_log->updated_by = $this->updated_by;
+              $status_log->created_at = time();
+              $status_log->save();
+            } 
+}
+
     }

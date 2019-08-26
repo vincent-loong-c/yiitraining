@@ -3,16 +3,16 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Status;
-use app\models\StatusSearch;
+use app\models\StatusLog;
+use app\models\StatusLogSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * StatusController implements the CRUD actions for Status model.
+ * StatusLogController implements the CRUD actions for StatusLog model.
  */
-class StatusController extends Controller
+class StatusLogController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -29,7 +29,7 @@ class StatusController extends Controller
         ];
     }
 
-    public function beforeAction($action)
+     public function beforeAction($action)
     {
         if (Yii::$app->user->isGuest) {
             $this->redirect('/user/login');
@@ -43,12 +43,12 @@ class StatusController extends Controller
     }
 
     /**
-     * Lists all Status models.
+     * Lists all StatusLog models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new StatusSearch();
+        $searchModel = new StatusLogSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -58,7 +58,7 @@ class StatusController extends Controller
     }
 
     /**
-     * Displays a single Status model.
+     * Displays a single StatusLog model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -71,30 +71,30 @@ class StatusController extends Controller
     }
 
     /**
-     * Creates a new Status model.
+     * Creates a new StatusLog model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Status();
- 
-        if ($model->load(Yii::$app->request->post())) {
-          //$model->created_by = Yii::$app->user->getId();
-          
-          $model->created_at = time();
-          $model->updated_at = time();
-           if ($model->save()) {             
-             return $this->redirect(['view', 'id' => $model->id]);             
-           } 
-        } 
+        if(Yii::$app->user->identity->role !=1){
+            Yii::$app->session->setFlash('error', "You do not have access for modifications.");
+           return $this->redirect('index');
+        }
+
+        $model = new StatusLog();
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
+        }
+
         return $this->render('create', [
             'model' => $model,
         ]);
     }
 
     /**
-     * Updates an existing Status model.
+     * Updates an existing StatusLog model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -102,6 +102,11 @@ class StatusController extends Controller
      */
     public function actionUpdate($id)
     {
+        if(Yii::$app->user->identity->role !=1){
+            Yii::$app->session->setFlash('error', "You do not have access for modifications.");
+           return $this->redirect('index');
+        }
+
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
@@ -114,7 +119,7 @@ class StatusController extends Controller
     }
 
     /**
-     * Deletes an existing Status model.
+     * Deletes an existing StatusLog model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
@@ -122,6 +127,7 @@ class StatusController extends Controller
      */
     public function actionDelete($id)
     {
+
         if(Yii::$app->user->identity->role !=1){
             Yii::$app->session->setFlash('error', "You do not have access for modifications.");
            return $this->redirect('index');
@@ -132,27 +138,18 @@ class StatusController extends Controller
     }
 
     /**
-     * Finds the Status model based on its primary key value.
+     * Finds the StatusLog model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Status the loaded model
+     * @return StatusLog the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Status::findOne($id)) !== null) {
+        if (($model = StatusLog::findOne($id)) !== null) {
             return $model;
         }
 
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-    //This function will redirect to a website
-    // <action> is the command used in /controller/action
-    //in this function the action is called "Page"
-    //so in the URL is: /status/page
-    
-    public function actionPage(){
-        $this->redirect('https://code.tutsplus.com/tutorials/how-to-program-with-yii2-exploring-mvc-forms-and-layouts--cms-22682');
+        throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
     }
 }
